@@ -11,8 +11,7 @@ void fast_io() {
 bool vis[10][10];
 queue<int> qr, qc;
 
-
-int exploreNeighbours(int cr, int cc,  int er, int ec) {
+int countNextMove(int cr, int cc,  int er, int ec) {
     int dr[] = {-1, -2, -2, -1, 1, 2, 2, 1}; //delta r
     int dc[] = {-2, -1, 1, 2, -2, -1, 1, 2}; //delta c
     int nextDistMove = 0;
@@ -49,7 +48,7 @@ int fewestMove(int sr, int sc, int er, int ec) {
             moves = distance;
             found = true;
         }
-        if (!found) nextDistMove += exploreNeighbours(cr, cc, er, ec);
+        if (!found) nextDistMove += countNextMove(cr, cc, er, ec);
         if (curDistMove == 0) {
             curDistMove = nextDistMove;
             nextDistMove = 0;
