@@ -108,7 +108,8 @@ int main() {
         k = 0;
         for (ll i = 1; i <= N; i++) {
             if (dfsvis[i]) continue;
-            dfs(++i);
+            k++;
+            dfs(i);
         }
         
         if (k == 1) {
