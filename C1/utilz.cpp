@@ -68,7 +68,7 @@ ll C(ll n, ll r) {
     ll k = n - r;
     ll d = 2;
     if (k < r) swap(k, r);
-    for (ll x = n; x >= k+1; x--) {
+    for (ll x = n; x > k; x--) {
         res *= x;
         while (d <= r && res % d == 0) {
             res /= d;
@@ -78,6 +78,20 @@ ll C(ll n, ll r) {
 
     return res;
 }
+
+//permutation implementation
+ll P(ll n, ll r) {
+    if (n < r) return 0;
+
+    ll res = 1;
+    ll k = n - r;
+    for (ll x = n; x > k; x--) {
+        res *= x;
+    }
+
+    return res;
+}
+
 
 //factorial implementation
 ll F(ll x) {
@@ -90,10 +104,20 @@ ll F(ll x) {
     return res;
 }
 
+//modular exponentiation implementation
+ll modexp(ll X, ll exp, ll mod = 1000000007) {
+    if (exp == 0) return 1;
+    
+    ll temp = modexp(X, exp/2, mod);
+    ll res = temp * temp;
+    if (exp % 2 == 1) res *= X;
+    return res % mod;
+}
+
 int main() {
     fast_io();
     //use ll when possible!
-    ll test = C(20, 12);
+    ll test = P(5, 5);
     cout << test << "\n";
 
     return 0;
