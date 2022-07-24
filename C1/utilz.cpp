@@ -109,15 +109,17 @@ ll modexp(ll X, ll exp, ll mod = 1000000007) {
     if (exp == 0) return 1;
     
     ll temp = modexp(X, exp/2, mod);
-    ll res = temp * temp;
-    if (exp % 2 == 1) res *= X;
-    return res % mod;
+    ll res = (temp * temp) % mod;
+    if (exp % 2 == 1) res = (res * X) % mod;
+
+    return res;
 }
 
 int main() {
     fast_io();
     //use ll when possible!
     ll test = P(5, 5);
+
     cout << test << "\n";
 
     return 0;
