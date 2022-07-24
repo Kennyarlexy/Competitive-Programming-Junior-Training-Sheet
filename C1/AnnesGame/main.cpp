@@ -8,15 +8,12 @@ void fast_io() {
     cin.tie(0);
 }
 
-ll P(ll n, ll r) {
-    if (n < r) return 0;
-
-    ll res = 1;
-    ll k = n - r;
-    for (ll x = n; x > k; x--) {
-        res = (res * x) % 2000000011;
-    }
-
+ll modexp(ll X, ll exp, ll mod = 2000000011) {
+    if (exp == 0) return 1;
+    
+    ll temp = modexp(X, exp/2, mod);
+    ll res = (temp * temp) % mod;
+    if (exp % 2 == 1) res = (res * X) % mod;
     return res;
 }
 
@@ -26,14 +23,14 @@ int main() {
     ll T; cin >> T;
     for (ll t = 1; t <= T; t++) {
         ll n; cin >> n;
-        
+        ll res;
         if (n == 1) {
-            cout << "1\n";
+            res = 1;
         } else {
-            ll res = P(n, n) - P(n-1, n-1);
-            cout << res << "\n";
+            res = modexp(n, n-2);
         }
+        cout << "Case #" << t << ": " << res << "\n";
     }
-
+    
     return 0;
 }
