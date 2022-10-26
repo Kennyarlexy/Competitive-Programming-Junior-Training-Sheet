@@ -18,30 +18,25 @@ int main() {
         for (int i = 0; i < N; i++) {
             cin >> X[i];
         }
-
         sort(X, X+N);
 
-        int d = 1;
+        int d = 0;
         int l = X[0], r = X[N-1];
-        for (int step = (r-l+1)/(C-1) - 1; step >= 1; step/=2) {
+        //increase the d, step by step using binary search technique
+        for (int step = (X[N-1]-X[0]+1)/2; step >= 1; step/=2) {
             while (true) {
-                int temp = d+step;
-                bool OK = false;
+                int new_d = d+step; //let's try this new d, can all cows still fit?
                 int cowPlaced = 1;
                 int prev = X[0];
                 for (int i = 1; i < N; i++) {
-                    if (X[i] - prev >= temp) {
+                    if (X[i] - prev >= new_d) {
                         cowPlaced++;
                         prev = X[i];
-                    }
-
-                    if (cowPlaced == C) {
-                        OK = true;
-                        break;
+                        if (cowPlaced == C) break;
                     }
                 }
-                if (!OK) break;
-                d = temp;
+                if (cowPlaced < C) break;
+                d = new_d; //same with d += step, repeat the loop, attempt to increase the d but still with the same step
             }
         }
 
