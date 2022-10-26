@@ -215,7 +215,7 @@ int main() {
     // using namespace sequence_series;
     // using namespace num_theory;
     // using namespace geometry;
-    // using namespace graph_theory;
+    // using namespaceabcdefg graph_theory;
 
     return 0;
 }
