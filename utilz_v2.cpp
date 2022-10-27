@@ -51,6 +51,41 @@ namespace sequence_series {
 };
 
 namespace num_theory {
+
+ll modInverse(ll A, ll M)
+{
+ // Returns modulo inverse of a with respect
+// to m using extended Euclid Algorithm
+// Assumption: a and m are coprimes, i.e.,
+// gcd(A, M) = 1
+    ll m0 = M;
+    ll y = 0, x = 1;
+    
+    if (M == 1) return 0;
+ 
+	while (A > 1) {
+
+        ll q = A / M;
+        ll t = M;
+        M = A % M, A = t;
+        t = y;
+ 
+
+        // Update y and x
+
+        y = x - q * y;
+
+        x = t;
+
+    }
+ 
+
+    // Make x positive
+
+    if (x < 0) x += m0;
+ 
+    return x;
+}
     //modular exponentiation implementation
     ll modexp(ll X, ll exp, ll mod = 1000000007) {
         if (exp == 0) return 1;
@@ -223,8 +258,7 @@ int main() {
 /*
  * fast expo
  * modular inverse
- * __gcd
- * union find <<<<<< paling sering keluar di gemastik
+ * union find <<<<<< paling sering keluar di gemastik 
  * BIT (binary indexed tree)/fenwick tree, or segment tree (+ lazy prop.)
  * shortest path (dijkstra, floyd-warshall (-ve cycle))
  * dp classical (2d sum, kadane, knapsack (w gede))
