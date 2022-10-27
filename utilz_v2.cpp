@@ -84,33 +84,28 @@ namespace num_theory {
 	}
 
 	ll modInverse(ll A, ll M){
- 
-   	 ll m0 = M;
-	    ll y = 0, x = 1;
+        ll m0 = M;
+        ll y = 0, x = 1;        
+        if (M == 1) return 0;
+        while (A > 1) {
+            ll q = A / M;
+            ll t = M;
+            M = A % M, A = t;
+            t = y;
+            y = x - q * y;
+            x = t;
+        }
+
+        if (x < 0) x += m0;
     
-	    if (M == 1) return 0;
- 
-		while (A > 1) {
-
-   	     ll q = A / M;
-   	     ll t = M;
-  	      M = A % M, A = t;
- 	       t = y;
-  	      y = x - q * y;
-      	  x = t;
-
-	    }
-
-  	  if (x < 0) x += m0;
- 
- 	   return x;
+        return x;
 	}
     //modular exponentiation implementation
     ll modexp(ll X, ll exp, ll mod = 1000000007) {
         if (exp == 0) return 1;
         ll root = modexp(X, exp/2, mod);
         ll res = (root * root) % mod;
-        if (exp % 2 == 1) res = (res * X) % mod;
+        if (exp & 1) res = (res * X) % mod;
         return res;
     }
 
@@ -122,19 +117,6 @@ namespace num_theory {
             res *= k;
         }
         return res;
-    }
-
-    //fibonacci: 0, 1, 2, 3, 5, ...
-    ll fib(ll n) {
-        if (n == 0) return 0;
-        if (n == 1) return 1;
-        ll a = 0, b = 1, c;
-        for (ll i = 2; i <= n; i++) {
-            c = a + b;
-            a = b;
-            b = c;
-        }
-        return c;
     }
 
     void construct_fib(ll A[], ll size) {
@@ -236,8 +218,10 @@ namespace geometry {
 
     
 namespace graph_theory {
-    vector<ll> adj[100005];
-    bool vis[100005];
+    vector<ll> adj[1005];
+    bool vis[1005];
+    bool vis1[1005];
+    bool vis2[1005];
 
     void dfs(ll u) {
         if (vis[u]) return;
@@ -258,6 +242,21 @@ namespace graph_theory {
             Q.push(v);
             vis[v] = true;
         }
+    }
+
+    bool isCyclic(ll u) {
+        if (vis1[u]) return vis2[u];
+
+        vis1[u] = true;
+        bool cyclic = false;
+        for (auto& v : adj[u]) {
+            if (isCyclic(v)) {
+                cyclic = true;
+                break;
+            }
+        }
+        vis2[u] = false;
+        return cyclic;
     }
 };
 
