@@ -248,6 +248,7 @@ namespace graph_theory {
         if (vis1[u]) return vis2[u];
 
         vis1[u] = true;
+        vis2[u] = true;
         bool cyclic = false;
         for (auto& v : adj[u]) {
             if (isCyclic(v)) {
