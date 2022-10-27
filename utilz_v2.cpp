@@ -51,41 +51,60 @@ namespace sequence_series {
 };
 
 namespace num_theory {
+	void multiply(ll F[2][2], ll M[2][2]);
+	void power(ll F[2][2], ll n);
 
-ll modInverse(ll A, ll M)
-{
- // Returns modulo inverse of a with respect
-// to m using extended Euclid Algorithm
-// Assumption: a and m are coprimes, i.e.,
-// gcd(A, M) = 1
-    ll m0 = M;
-    ll y = 0, x = 1;
+	ll mod = 1e9+7;
+
+	ll fib(ll n){
+		ll F[2][2] = {{1, 1}, {1, 0}};
+		if (n == 0) return 0;
+		power(F, n - 1);
+		return F[0][0];
+	}
+
+	void power(ll F[2][2], ll n){
+		if(n == 0 || n == 1) return;
+		ll M[2][2] = {{1, 1}, {1, 0}};
+	
+		power(F, n / 2); multiply(F, F);
+		if (n % 2 != 0) multiply(F, M);
+	}
+
+	void multiply(ll F[2][2], ll M[2][2]){
+		ll x = ((F[0][0] % mod * M[0][0] % mod) + (F[0][1] * M[1][0] % mod)) % mod;
+		ll y = ((F[0][0] % mod * M[0][1] % mod) + (F[0][1] * M[1][1] % mod)) % mod;
+		ll z = ((F[1][0] % mod * M[0][0] % mod) + (F[1][1] * M[1][0] % mod)) % mod;
+		ll w = ((F[1][0] % mod * M[0][1] % mod) + (F[1][1] % mod * M[1][1] % mod)) % mod;
+	
+		F[0][0] = x;
+		F[0][1] = y;
+		F[1][0] = z;
+		F[1][1] = w;
+	}
+
+	ll modInverse(ll A, ll M){
+ 
+   	 ll m0 = M;
+	    ll y = 0, x = 1;
     
-    if (M == 1) return 0;
+	    if (M == 1) return 0;
  
-	while (A > 1) {
+		while (A > 1) {
 
-        ll q = A / M;
-        ll t = M;
-        M = A % M, A = t;
-        t = y;
+   	     ll q = A / M;
+   	     ll t = M;
+  	      M = A % M, A = t;
+ 	       t = y;
+  	      y = x - q * y;
+      	  x = t;
+
+	    }
+
+  	  if (x < 0) x += m0;
  
-
-        // Update y and x
-
-        y = x - q * y;
-
-        x = t;
-
-    }
- 
-
-    // Make x positive
-
-    if (x < 0) x += m0;
- 
-    return x;
-}
+ 	   return x;
+	}
     //modular exponentiation implementation
     ll modexp(ll X, ll exp, ll mod = 1000000007) {
         if (exp == 0) return 1;
