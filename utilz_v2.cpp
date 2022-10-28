@@ -96,7 +96,7 @@ namespace num_theory {
             x = t;
         }
 
-        if (x < 0) x += m0;
+		if (x < 0) x += m0;
     
         return x;
 	}
