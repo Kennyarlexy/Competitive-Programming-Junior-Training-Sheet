@@ -51,10 +51,10 @@ namespace sequence_series {
 };
 
 namespace num_theory {
+    ll mod = 1e9+7;
     void multiply(ll F[2][2], ll M[2][2]);
     void power(ll F[2][2], ll n);
 
-    ll mod = 1e9+7;
 
     ll fib(ll n){
         ll F[2][2] = {{1, 1}, {1, 0}};
@@ -112,22 +112,20 @@ namespace num_theory {
 
     //factorial implementation
     ll F(ll x) {
+        // beware of overflow
         if (x == 0) return 1;
         ll res = 1;
         for (ll k = x; k >= 2; k--) {
             res *= k;
-            // remove above and add this if want to mod it by 1e9+7 bcs biggest fac that C++ long long can hold is 20!
-            // res = ((res%mod) * (k%mod)) % mod; 
         }
         return res;
     }
 
     void construct_fib(ll A[], ll size) {
+        // cuman bisa sampai fib ke-93
         A[0] = 0, A[1] = 1;
         for (ll i = 2; i <= size; i++) {
             A[i] = A[i-2] + A[i-1];
-            // remove above and add this if want to mod it by 1e9+7 bcs biggest fibo that C++ long long can hold is F(93)
-            // A[i] = ((A[i-2]%mod) + (A[i-1]%mod)) % mod;
         }
     }
 
@@ -166,8 +164,28 @@ namespace num_theory {
         return result;
     }
 
+    vector<ll> Phi(100000);
+    void phi_1_to_n(ll n) {
+    for (ll i = 0; i <= n; i++) Phi[i] = i;
+        for (ll i = 2; i <= n; i++) {
+            if (Phi[i] == i) {
+                for (ll j = i; j <= n; j += i)
+                    Phi[j] -= Phi[j] / i;
+            }
+        }
+    }
+
     ll largestDivPow2(ll x) {
         return x & -x;
+    }
+
+    ll gcd(ll A, ll B) {
+        if (B == 0) return A;
+        return gcd(B, A % B);
+    }
+
+    ll lcm(ll A, ll B) {
+        return A / __gcd(A, B) * B;
     }
 };
 
@@ -261,6 +279,7 @@ namespace generator {
 };
 
 namespace graph_theory {
+    ll N;
     vector<ll> adj[300005];
     bool vis[300005];
     //for cycle detection
@@ -271,6 +290,30 @@ namespace graph_theory {
     ll size[300005];
     //for 0-1 BFS
     ll dist[300005];
+    //for flood fill;
+    char grid[1005][1005];
+    bool visff[1005][1005];
+
+    //for dijkstra and MST -> Edge, cmp, adjE, PQ
+    //Edge may also contain from
+    struct Edge {
+        ll to;
+        ll cost;
+        Edge(ll _to, ll _cost) {
+            to = _to;
+            cost = _cost;
+        }
+    };
+    
+    struct cmp {
+        bool operator () (Edge A, Edge B) {
+            return A.cost > B.cost;
+        }
+    };
+
+    vector<Edge> adjE[300005];
+    priority_queue<Edge, vector<Edge>, cmp> PQ; //minimum priority queue
+
 
     void dfs(ll u) {
         if (vis[u]) return;
@@ -288,8 +331,8 @@ namespace graph_theory {
         while (!Q.empty()) {
             ll u = Q.front(); Q.pop();
             for (auto& v : adj[u]) {
-                if (vis[v]) continue;
                 // add more constraint when needed
+                if (vis[v]) continue;
                 Q.push(v);
                 vis[v] = true;
             }
@@ -342,17 +385,121 @@ namespace graph_theory {
         while (!Q.empty()) {
             ll u = Q.front(); Q.pop();
             for (auto& v : adj[u]) {
-                if (vis[v]) continue;
                 // add more constraint when needed
+                if (vis[v]) continue;
                 Q.push(v);
                 vis[v] = true;
                 dist[v] = dist[u] + 1;
             }
         }
     }
+
+    void flood_fill_4(ll sr, ll sc) {
+        queue<ll> Qr; Qr.push(sr);
+        queue<ll> Qc; Qc.push(sc);
+        visff[sr][sc] = true;
+
+        ll dr[] = {1, 0, -1, 0};
+        ll dc[] = {0, 1, 0, -1};
+        while (!Qr.empty()) {
+            ll cr = Qr.front(); Qr.pop();
+            ll cc = Qc.front(); Qc.pop();
+            for (ll i = 0; i < 4; i++) {
+                ll nr = cr + dr[i];
+                ll nc = cc + dc[i];
+                // constraint > 0
+                if (visff[nr][nc]) continue;
+
+                Qr.push(nr);
+                Qc.push(nc);
+                visff[nr][nc] = true;
+            }
+        }
+    }
+
+    void flood_fill_8(ll sr, ll sc) {
+        queue<ll> Qr; Qr.push(sr);
+        queue<ll> Qc; Qc.push(sc);
+        visff[sr][sc] = true;
+
+        ll dr[] = {1, 1, 0, -1, -1, -1, 0, 1};
+        ll dc[] = {0, 1, 1, 1, 0, -1, -1, -1};
+        while (!Qr.empty()) {
+            ll cr = Qr.front(); Qr.pop();
+            ll cc = Qc.front(); Qc.pop();
+            for (ll i = 0; i < 4; i++) {
+                ll nr = cr + dr[i];
+                ll nc = cc + dc[i];
+                // constraint > 0
+                if (visff[nr][nc]) continue;
+
+                Qr.push(nr);
+                Qc.push(nc);
+                visff[nr][nc] = true;
+            }
+        }
+    }
+
+
+    void dijkstra(ll start) {
+        //need create priority_queue in ascending order, declare as global
+        //initially, set dist[u] for every u to INFINITY
+        PQ.emplace(start, 0);
+        dist[start] = 0;
+        
+        while (!PQ.empty()) {
+            ll current, prevMin;
+            Edge e = PQ.top(); PQ.pop();
+            vis[e.to] = true;
+            // e.cost here is cumulative edge cost from node start
+            if (dist[e.to] < e.cost) continue; //is e.cost outdated?
+
+            for (auto& ne : adjE[e.to]) {
+                if (vis[ne.to]) continue;
+                dist[ne.to] = min(dist[ne.to], e.cost + ne.cost);
+                PQ.emplace(ne.to, dist[ne.to]);
+            }
+        }
+    }
+
+    void addE(ll u) {
+        for (auto& [to, cost] : adjE[u]) {
+            if (vis[to]) continue;
+            PQ.emplace(to, cost);
+        }
+    }
+
+    // returns the MST's total edge weight
+    ll mst(ll start, bool flag) {
+        vis[start] = true;
+        ll E = 0;
+        ll ME = N - 1;
+        ll total = 0;
+        addE(start);
+        while (!PQ.empty() && E < ME) {
+            Edge e = PQ.top(); PQ.pop();
+            if (vis[e.to]) continue;
+
+            E++;
+            total += e.cost;
+            vis[e.to] = true;
+            addE(e.to);
+        }
+
+        if (E == ME) return total;
+        else return -1;
+    }
 };
 
-
+namespace algo_string {
+    string s;
+    bool isPalindrome(ll l, ll r) {
+        while (l <= r) {
+            if (s[l++] != s[r--]) return false;
+        }
+        return true;
+    }
+};
 
 int main() {
     fast_io();
@@ -364,7 +511,8 @@ int main() {
     // using namespace bitmask;
     // using namespace generator;
     // using namespace graph_theory;
-
+    // using namespace algo_string;
+    
     return 0;
 }
 
